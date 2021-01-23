@@ -200,7 +200,7 @@ export class SelectFactory extends React.Component<
 
   public componentDidUpdate(prevState: any) {
     if (this.props.value && prevState.value !== this.props.value) {
-      this.updateState(this.props.value.label, this.props.value.value)
+      this.updateState(this.props.value.value, this.props.value.label)
     }
   }
 
