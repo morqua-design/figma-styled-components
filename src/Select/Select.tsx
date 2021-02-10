@@ -176,8 +176,10 @@ export interface SelectProps {
 export const SelectFactory: React.FC<SelectProps> = ({ value, onChange, placeholder, options, ...restProps }) => {
   const [showOptions, setShowOptions] = React.useState(false)
 
-  const handleClick = (event: React.MouseEvent) =>
+  const handleClick = (event: React.MouseEvent) => {
     onChange(event.currentTarget.getAttribute('data-value') || '')
+    setShowOptions(false);
+  }
 
   const toggleSelect = () => {
     setShowOptions((sOptions) => !sOptions)
@@ -186,7 +188,7 @@ export const SelectFactory: React.FC<SelectProps> = ({ value, onChange, placehol
   return (
     <div {...restProps}>
       <SelectOverlay
-        show={showOptions ? true : false}
+        show={showOptions}
         onClick={toggleSelect}
       />
       <SelectTrigger onClick={toggleSelect}>
