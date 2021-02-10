@@ -3,30 +3,6 @@ import styled from 'styled-components'
 
 import { Text } from '../Text'
 
-export interface SelectOptionItem {
-  label: string
-  value: string
-}
-
-export interface SelectOptions extends SelectOptionItem {
-  group?: SelectOptionItem[]
-}
-
-interface SelectOptionGroup {
-  label: string
-  group: SelectOptionItem[]
-}
-
-// TODO how to type onChange to return string
-export interface SelectProps {
-  options: Array<SelectOptionItem | SelectOptionGroup>
-  defaultValue?: SelectOptionItem
-  onChange?: any
-  placeholder?: string
-  noDefault?: boolean
-  value?: { value: string; label: string }
-}
-
 const SelectedCheck = () => {
   return (
     <svg
@@ -175,145 +151,95 @@ const SelectOverlay = styled.div<{ show: boolean }>`
   background: rgba(255, 255, 255, 0);
 `
 
-export class SelectFactory extends React.Component<
-  SelectProps,
-  { value: SelectOptionItem; madeSelection: boolean; showOptions: boolean }
-> {
-  private figmaSelect: React.RefObject<HTMLSelectElement>
+export interface SelectOptionItem {
+  label: string
+  value: string
+}
 
-  constructor(props: SelectProps) {
-    super(props)
-    this.state = {
-      madeSelection: false,
-      showOptions: false,
-      value: props.value
-        ? props.value
-        : props.defaultValue
-        ? props.defaultValue
-        : this.getInialOption()
-    }
+export interface SelectOptions extends SelectOptionItem {
+  group?: SelectOptionItem[]
+}
 
-    this.toggleSelect = this.toggleSelect.bind(this)
-    this.handleClick = this.handleClick.bind(this)
-    this.figmaSelect = React.createRef()
+interface SelectOptionGroup {
+  label: string
+  group: SelectOptionItem[]
+}
+
+// TODO how to type onChange to return string
+export interface SelectProps {
+  value: SelectOptionItem
+  onChange: any
+  placeholder: string
+  options: Array<SelectOptionItem | SelectOptionGroup>
+}
+
+export const SelectFactory: React.FC<SelectProps> = ({ value, onChange, placeholder, options, ...restProps }) => {
+  const [showOptions, setShowOptions] = React.useState(false)
+
+  const handleClick = (event: React.MouseEvent) =>
+    onChange(event.currentTarget.getAttribute('data-value') || '')
+
+  const toggleSelect = () => {
+    setShowOptions((sOptions) => !sOptions)
   }
 
-  public componentDidUpdate(prevState: any) {
-    if (this.props.value && prevState.value !== this.props.value) {
-      this.updateState(this.props.value.value, this.props.value.label)
-    }
-  }
-
-  public render () {
-    const {
-      defaultValue,
-      placeholder,
-      options,
-      onChange,
-      noDefault,
-      value,
-      ...props
-    } = this.props
-    return (
-      <div {...props}>
-        <SelectOverlay
-          show={this.state.showOptions ? true : false}
-          onClick={this.toggleSelect}
-        />
-        <SelectTrigger onClick={this.toggleSelect}>
-          <Text>
-            {placeholder && !this.state.madeSelection
-              ? placeholder
-              : this.state.value.label}
-          </Text>
-          <SelectChevron />
-        </SelectTrigger>
-        <SelectOptions
-          className={this.state.showOptions ? 'show-options' : undefined}
-        >
-          {options.map((option, i) => {
-            if ('group' in option) {
-              return (
-                <SelectGroup key={`group-parent-` + i}>
-                  {option.group.map((item) => {
-                    return (
-                      <SelectItem
-                        key={`group-` + item.label}
-                        id={item.value || item.label}
-                        data-value={item.value}
-                        data-label={item.label || item.value}
-                        onClick={this.handleClick}
-                      >
-                        {this.state.value.value === item.value &&
-                          this.state.madeSelection && <SelectedCheck />}
-                        <Text size='medium' inverted={true}>
-                          {item.label}
-                        </Text>
-                      </SelectItem>
-                    )
-                  })}
-                </SelectGroup>
-              )
-            } else {
-              return (
-                <SelectItem
-                  key={`list-` + i}
-                  id={option.value}
-                  data-value={option.value}
-                  data-label={option.label || option.value}
-                  onClick={this.handleClick}
-                >
-                  {this.state.value.value === option.value && <SelectedCheck />}
-                  <Text size='medium' inverted={true}>
-                    {option.label || option.value}
-                  </Text>
-                </SelectItem>
-              )
-            }
-          })}
-        </SelectOptions>
-      </div>
-    )
-  }
-
-  private handleClick(event: React.MouseEvent) {
-    const target = event.currentTarget
-
-    const value = target.getAttribute('data-value') || ''
-    const label = target.getAttribute('data-label') || ''
-
-    this.updateState(value, label)
-  }
-
-  private updateState(value: string, label: string) {
-    this.setState(
-      {
-        madeSelection: true,
-        showOptions: false,
-        value: { value, label }
-      },
-      this.props.onChange ? this.props.onChange(value) : undefined
-    )
-  }
-
-  private toggleSelect(e: any) {
-    this.setState({ showOptions: !this.state.showOptions })
-  }
-
-  private getInialOption  () {
-    const firstOption = this.props.options[0]
-    if ('group' in firstOption) {
-      return {
-        label: firstOption.group[0].label,
-        value: firstOption.group[0].value
-      }
-    } else {
-      return {
-        label: firstOption.label,
-        value: firstOption.value
-      }
-    }
-  }
+  return (
+    <div {...restProps}>
+      <SelectOverlay
+        show={showOptions ? true : false}
+        onClick={toggleSelect}
+      />
+      <SelectTrigger onClick={toggleSelect}>
+        <Text>
+          {value?.label ?? placeholder}
+        </Text>
+        <SelectChevron />
+      </SelectTrigger>
+      <SelectOptions
+        className={showOptions ? 'show-options' : undefined}
+      >
+        {options.map((option, i) => {
+          if ('group' in option) {
+            return (
+              <SelectGroup key={`group-parent-` + i}>
+                {option.group.map((item) => {
+                  return (
+                    <SelectItem
+                      key={`group-` + item.label}
+                      id={item.value || item.label}
+                      data-value={item.value}
+                      data-label={item.label || item.value}
+                      onClick={handleClick}
+                    >
+                      {value?.value === item.value && <SelectedCheck />}
+                      <Text size='medium' inverted={true}>
+                        {item.label}
+                      </Text>
+                    </SelectItem>
+                  )
+                })}
+              </SelectGroup>
+            )
+          } else {
+            return (
+              <SelectItem
+                key={`list-` + i}
+                id={option.value}
+                data-value={option.value}
+                data-label={option.label || option.value}
+                onClick={handleClick}
+              >
+                {value?.value === option.value && <SelectedCheck />}
+                <Text size='medium' inverted={true}>
+                  {option.label || option.value}
+                </Text>
+              </SelectItem>
+            )
+          }
+        })}
+      </SelectOptions>
+    </div>
+  )
 }
 
 export const Select = styled(SelectFactory)`

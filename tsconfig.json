@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "jsx": "react",
-    "target": "esnext",
+    "target": "es2020",
     "esModuleInterop": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "declaration": true,
     "outDir": "./dist",
     "strict": true,
-    "types": ["react", "jest"],
+    "types": ["react", "jest"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "stories", "src/**/*.test.*"]
