@@ -184,7 +184,7 @@ interface SelectOptionGroup {
 export interface SelectProps {
   value: SelectOptionItem
   onChange: (val: string) => any
-  onReset: () => any
+  onReset?: () => any
   placeholder: string
   options: Array<SelectOptionItem | SelectOptionGroup>
 }
