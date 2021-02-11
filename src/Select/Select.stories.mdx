@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Select } from './Select'
 import { Story, Meta } from '@storybook/addon-docs/blocks'
 
@@ -8,15 +9,48 @@ import { Story, Meta } from '@storybook/addon-docs/blocks'
 ## Default Select
 
 <Story name='Select'>
-  <div className='component-box'>
-    <Select
-      options={[
-        { value: '1', label: 'One' },
-        { value: '2', label: 'Two' },
-        { value: '3', label: 'Three' }
-      ]}
-    />
-  </div>
+    {() => {
+        const [value, setValue] = useState('1')
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+            { value: '3', label: 'Three' }
+        ]
+        const selectedOption = options.find(o => o.value === value)
+        return (
+            <div className='component-box'>
+                <Select
+                    value={selectedOption}
+                    onChange={(val) => setValue(val)}
+                    options={options}
+                />
+            </div>
+        )
+    }}
+</Story>
+
+## Select with reset
+
+<Story name='Select with reset'>
+    {() => {
+        const [value, setValue] = useState('1')
+        const options = [
+            { value: '1', label: 'One' },
+            { value: '2', label: 'Two' },
+            { value: '3', label: 'Three' }
+        ]
+        const selectedOption = options.find(o => o.value === value)
+        return (
+            <div className='component-box'>
+                <Select
+                    value={selectedOption}
+                    onChange={(val) => setValue(val)}
+                    options={options}
+                    onReset={() => setValue('')}
+                />
+            </div>
+        )
+    }}
 </Story>
 
 ## Select with default

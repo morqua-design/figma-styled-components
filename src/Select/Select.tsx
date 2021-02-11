@@ -1,5 +1,7 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+import {Icon} from '../Icon'
+import {OptionButton} from '../OptionButton'
 
 import { Text } from '../Text'
 
@@ -73,7 +75,7 @@ const SelectChevronIcon = (props: any) => {
 
 const SelectChevron = styled(SelectChevronIcon)``
 
-const SelectTrigger = styled.button`
+const SelectTrigger = styled.button<{ $showReset: boolean }>`
   display: flex;
   align-items: center;
   width: 100%;
@@ -97,6 +99,12 @@ const SelectTrigger = styled.button`
     margin-left: 8px;
     color: rgba(0, 0, 0, 0.2);
   }
+
+  ${({ $showReset }) => $showReset && css`
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    justify-content: space-between;
+    padding-right: 0;
+  `}
 
   &:hover {
     border: 1px solid rgba(0, 0, 0, 0.1);
@@ -141,6 +149,14 @@ const SelectOptions = styled.ul`
   }
 `
 
+const SelectReset = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  right: 0;
+`
+
 const SelectOverlay = styled.div<{ show: boolean }>`
   display: ${(props) => (props.show ? 'block' : 'none')};
   position: fixed;
@@ -165,25 +181,34 @@ interface SelectOptionGroup {
   group: SelectOptionItem[]
 }
 
-// TODO how to type onChange to return string
 export interface SelectProps {
   value: SelectOptionItem
-  onChange: any
+  onChange: (val: string) => any
+  onReset: () => any
   placeholder: string
   options: Array<SelectOptionItem | SelectOptionGroup>
 }
 
-export const SelectFactory: React.FC<SelectProps> = ({ value, onChange, placeholder, options, ...restProps }) => {
+export const SelectFactory: React.FC<SelectProps> = ({
+  value,
+  onChange,
+  onReset,
+  placeholder,
+  options,
+  ...restProps
+}) => {
   const [showOptions, setShowOptions] = React.useState(false)
 
   const handleClick = (event: React.MouseEvent) => {
     onChange(event.currentTarget.getAttribute('data-value') || '')
-    setShowOptions(false);
+    setShowOptions(false)
   }
 
   const toggleSelect = () => {
     setShowOptions((sOptions) => !sOptions)
   }
+
+  const showReset = Boolean(onReset && value)
 
   return (
     <div {...restProps}>
@@ -191,12 +216,13 @@ export const SelectFactory: React.FC<SelectProps> = ({ value, onChange, placehol
         show={showOptions}
         onClick={toggleSelect}
       />
-      <SelectTrigger onClick={toggleSelect}>
+      <SelectTrigger onClick={toggleSelect} $showReset={showReset}>
         <Text>
           {value?.label ?? placeholder}
         </Text>
-        <SelectChevron />
+        {!showReset && <SelectChevron />}
       </SelectTrigger>
+      {showReset && <SelectReset onClick={onReset}><Icon name='X' /></SelectReset>}
       <SelectOptions
         className={showOptions ? 'show-options' : undefined}
       >
