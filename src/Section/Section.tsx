@@ -3,37 +3,22 @@ import styled from 'styled-components'
 import { SectionTitle } from '../SectionTitle'
 
 export interface SectionProps {
-  title: string
+  title: React.ReactNode
   actions?: JSX.Element
   collapsed?: boolean
 }
 
-
-
-class SectionFactory extends React.Component<SectionProps,{ collapsed: boolean}> {
-  constructor (props: SectionProps) {
-    super(props)
-    this.state = {
-      collapsed: this.props.collapsed || false
-    }
-  }
-
-  public render () {
-    return(
-      <SectionWrapper collapsed={this.state.collapsed} {...this.props}>
-          <SectionHeader>
-            <SectionTitle>{this.props.title}</SectionTitle>
-            {this.props.actions &&
-              <SectionActions>{this.props.actions}</SectionActions>
-            }
-          </SectionHeader>
-          <SectionContent>
-            {this.props.children}
-          </SectionContent>
-      </SectionWrapper>
-    )
-  }
-}
+const SectionFactory: React.FC<SectionProps> = ({ collapsed = false, title, actions, children, ...restProps }) => (
+  <SectionWrapper collapsed={collapsed} {...restProps}>
+      <SectionHeader>
+        <SectionTitle>{title}</SectionTitle>
+        {actions && <SectionActions>{actions}</SectionActions>}
+      </SectionHeader>
+      <SectionContent>
+        {children}
+      </SectionContent>
+  </SectionWrapper>
+)
 
 const SectionContent = styled.div``
 
@@ -44,7 +29,7 @@ const SectionHeader = styled.div`
   justify-content: space-between;
 `
 
-const SectionWrapper = styled.section<SectionProps>`
+const SectionWrapper = styled.section<{ collapsed: boolean }>`
   padding: 8px;
 
   ${SectionHeader} {
