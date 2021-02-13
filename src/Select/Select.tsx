@@ -126,15 +126,15 @@ const SelectTrigger = styled.button<{ $showReset: boolean }>`
   }
 `
 
-const SelectOptions = styled.ul`
+const SelectOptions = styled.ul<{ $maxHeight?: number }>`
   position: absolute;
   z-index: 2;
   top: 31px;
   right: 0;
   left: 0;
-  display: block;
   overflow: auto;
   width: 100%;
+  max-height: ${({ $maxHeight }) => $maxHeight ? `${$maxHeight}px` : 'auto' };
   margin: 0;
   padding: 8px 0 8px 0;
   list-style-type: none;
@@ -187,6 +187,7 @@ export interface SelectProps {
   onReset?: () => any
   placeholder: string
   options: Array<SelectOptionItem | SelectOptionGroup>
+  maxHeight?: number
 }
 
 export const SelectFactory: React.FC<SelectProps> = ({
@@ -195,6 +196,7 @@ export const SelectFactory: React.FC<SelectProps> = ({
   onReset,
   placeholder,
   options,
+  maxHeight,
   ...restProps
 }) => {
   const [showOptions, setShowOptions] = React.useState(false)
@@ -225,6 +227,7 @@ export const SelectFactory: React.FC<SelectProps> = ({
       {showReset && <SelectReset onClick={onReset}><Icon name='X' /></SelectReset>}
       <SelectOptions
         className={showOptions ? 'show-options' : undefined}
+        $maxHeight={maxHeight}
       >
         {options.map((option, i) => {
           if ('group' in option) {
