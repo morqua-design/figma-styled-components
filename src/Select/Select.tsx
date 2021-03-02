@@ -73,7 +73,7 @@ const SelectChevronIcon = (props: any) => {
   )
 }
 
-const SelectChevron = styled(SelectChevronIcon)``
+export const SelectChevron = styled(SelectChevronIcon)``
 
 const SelectTrigger = styled.button<{ $showReset: boolean }>`
   display: flex;
